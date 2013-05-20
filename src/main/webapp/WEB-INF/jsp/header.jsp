@@ -48,9 +48,8 @@
           <a class="brand" href="">Demo</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">遍历关系</a></li>
-              <li><a href="#contact">计算人脉</a></li>
+              <li><a href="user/listFriends">遍历关系</a></li>
+              <li><a href="user/viewChain">计算人脉链</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>

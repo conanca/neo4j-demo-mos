@@ -1,13 +1,12 @@
 package com.dolplay.demo.mos.domain;
 
-public class Friend {
+public class User {
 
 	private long id;
 	private String name;
 	private int age;
 	private String gender;
 	private String profession;
-	private int depth;
 
 	public long getId() {
 		return id;
@@ -49,11 +48,4 @@ public class Friend {
 		this.profession = profession;
 	}
 
-	public int getDepth() {
-		return depth;
-	}
-
-	public void setDepth(int depth) {
-		this.depth = depth;
-	}
 }

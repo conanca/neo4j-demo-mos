@@ -54,6 +54,13 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-lucene-index</artifactId>
 			<version>1.8.2</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-graph-algo</artifactId>
+			<version>1.8.2</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.nutz</groupId>
