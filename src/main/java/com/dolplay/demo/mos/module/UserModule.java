@@ -1,5 +1,7 @@
 package com.dolplay.demo.mos.module;
 
+import java.util.List;
+
 import javax.servlet.ServletContext;
 
 import org.nutz.ioc.annotation.InjectName;
@@ -9,6 +11,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 
+import com.dolplay.demo.mos.domain.User;
 import com.dolplay.demo.mos.service.UserService;
 
 @IocBean
@@ -31,7 +34,9 @@ public class UserModule {
 	public ServletContext viewChain(@Param("startId") int startId, @Param("endId") int endId, ServletContext context) {
 		context.setAttribute("user", userService.view(startId));
 		context.setAttribute("targetUser", userService.view(endId));
-		context.setAttribute("chain", userService.findShortestFriendPath(startId, endId));
+		List<User> chain = userService.findShortestFriendPath(startId, endId);
+		context.setAttribute("chain", chain);
+		context.setAttribute("length", chain.size() - 2);
 		return context;
 	}
 }
