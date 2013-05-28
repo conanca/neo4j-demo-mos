@@ -15,9 +15,6 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 import org.neo4j.kernel.Traversal;
 import org.nutz.ioc.loader.annotation.IocBean;
-import org.nutz.json.Json;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.dolplay.demo.mos.domain.Friend;
 import com.dolplay.demo.mos.domain.User;
@@ -26,7 +23,6 @@ import com.dolplay.demo.mos.util.Rel;
 
 @IocBean
 public class UserService {
-	private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
 	public User view(long id) {
 		User user = new User();
@@ -75,7 +71,6 @@ public class UserService {
 		Node startNode = graphDb.getNodeById(startId);
 		Node endNode = graphDb.getNodeById(endId);
 		Path shortestPath = findShortestFriendPath(startNode, endNode).iterator().next();
-		logger.debug(Json.toJson(shortestPath));
 		for (Node node : shortestPath.nodes()) {
 			User user = new User();
 			user.setId(node.getId());
