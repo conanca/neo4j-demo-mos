@@ -10,12 +10,14 @@
     <button type="submit" class="btn">Submit</button>
   </form>
   
-  <h2>计算 ${user.name}和${targetUser.name}  之间的人脉链</h2>
+  <h5>计算 ${user.name}和${targetUser.name}  之间的人脉链</h5>
   
-  通过${length}个人认识
+  通过<strong>${length}</strong>个人认识
   
+  <h5>
   <c:forEach var="friend" items="${chain}">
     ${friend.name}  →  
   </c:forEach>
+  </h5>
 
 <jsp:include page="footer.jsp" />

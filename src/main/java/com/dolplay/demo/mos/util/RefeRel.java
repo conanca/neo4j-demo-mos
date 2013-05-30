@@ -2,6 +2,6 @@ package com.dolplay.demo.mos.util;
 
 import org.neo4j.graphdb.RelationshipType;
 
-public enum Rel implements RelationshipType {
-	EMPLOYS, MEMBER_OF, KNOWS, FOLLOWS
+public enum RefeRel implements RelationshipType {
+	LEAD, ORG
 }

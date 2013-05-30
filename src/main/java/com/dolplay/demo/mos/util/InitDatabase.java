@@ -16,12 +16,13 @@ public class InitDatabase {
 	private static Index<Node> orgIndex;
 
 	public static void init() {
-		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Neo4jDB.DB_PATH);
-		userIndex = graphDb.index().forNodes(Neo4jDB.USER_INDEX);
-		orgIndex = graphDb.index().forNodes(Neo4jDB.ORG_INDEX);
+		graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(Name.DB_PATH);
+		userIndex = graphDb.index().forNodes(Name.USER_INDEX);
+		orgIndex = graphDb.index().forNodes(Name.ORG_INDEX);
 
 		Transaction tx = graphDb.beginTx();
 		try {
+			Node referenceNode = graphDb.getReferenceNode();
 
 			// 创建主角用户
 			logger.debug("创建主角用户");
@@ -33,7 +34,16 @@ public class InitDatabase {
 			Node dazui = createIndexUser("李大嘴", 25, "男", "厨子");
 			Node xiaobei = createIndexUser("莫小贝", 8, "女", "掌门");
 
-			// 建立主角关系
+			// 指明主角
+			xiangyu.createRelationshipTo(referenceNode, RefeRel.LEAD);
+			zhantang.createRelationshipTo(referenceNode, RefeRel.LEAD);
+			xiaoguo.createRelationshipTo(referenceNode, RefeRel.LEAD);
+			xiucai.createRelationshipTo(referenceNode, RefeRel.LEAD);
+			wushuang.createRelationshipTo(referenceNode, RefeRel.LEAD);
+			dazui.createRelationshipTo(referenceNode, RefeRel.LEAD);
+			xiaobei.createRelationshipTo(referenceNode, RefeRel.LEAD);
+
+			// 建立主角之间关系
 			logger.debug("建立主角关系");
 			xiangyu.createRelationshipTo(zhantang, Rel.KNOWS);
 			xiangyu.createRelationshipTo(xiaoguo, Rel.KNOWS);
@@ -138,69 +148,80 @@ public class InitDatabase {
 			Node baima = createIndexOrg("白马书院", "");
 			Node kunlun = createIndexOrg("昆仑派", "");
 
+			// 指明单位
+			tongfu.createRelationshipTo(referenceNode, RefeRel.ORG);
+			hengshan.createRelationshipTo(referenceNode, RefeRel.ORG);
+			qixiazhen.createRelationshipTo(referenceNode, RefeRel.ORG);
+			shibalipu.createRelationshipTo(referenceNode, RefeRel.ORG);
+			longmen.createRelationshipTo(referenceNode, RefeRel.ORG);
+			baima.createRelationshipTo(referenceNode, RefeRel.ORG);
+			kunlun.createRelationshipTo(referenceNode, RefeRel.ORG);
+
 			// 建立单位(公司/组织/机构)关系
 			logger.debug("建立单位关系");
 			tongfu.createRelationshipTo(xiangyu, Rel.EMPLOYS);
-			xiangyu.createRelationshipTo(tongfu, Rel.EMPLOYED);
+			xiangyu.createRelationshipTo(tongfu, Rel.MEMBER_OF);
 			tongfu.createRelationshipTo(zhantang, Rel.EMPLOYS);
-			zhantang.createRelationshipTo(tongfu, Rel.EMPLOYED);
+			zhantang.createRelationshipTo(tongfu, Rel.MEMBER_OF);
 			tongfu.createRelationshipTo(xiaoguo, Rel.EMPLOYS);
-			xiaoguo.createRelationshipTo(tongfu, Rel.EMPLOYED);
+			xiaoguo.createRelationshipTo(tongfu, Rel.MEMBER_OF);
 			tongfu.createRelationshipTo(xiucai, Rel.EMPLOYS);
-			xiucai.createRelationshipTo(tongfu, Rel.EMPLOYED);
+			xiucai.createRelationshipTo(tongfu, Rel.MEMBER_OF);
 			tongfu.createRelationshipTo(dazui, Rel.EMPLOYS);
-			dazui.createRelationshipTo(tongfu, Rel.EMPLOYED);
+			dazui.createRelationshipTo(tongfu, Rel.MEMBER_OF);
 			hengshan.createRelationshipTo(xiaobei, Rel.EMPLOYS);
-			xiaobei.createRelationshipTo(hengshan, Rel.EMPLOYED);
+			xiaobei.createRelationshipTo(hengshan, Rel.MEMBER_OF);
 			qixiazhen.createRelationshipTo(xiaoliu, Rel.EMPLOYS);
-			xiaoliu.createRelationshipTo(qixiazhen, Rel.EMPLOYED);
+			xiaoliu.createRelationshipTo(qixiazhen, Rel.MEMBER_OF);
 			qixiazhen.createRelationshipTo(wushuang, Rel.EMPLOYS);
-			wushuang.createRelationshipTo(qixiazhen, Rel.EMPLOYED);
+			wushuang.createRelationshipTo(qixiazhen, Rel.MEMBER_OF);
 			shibalipu.createRelationshipTo(laoxing, Rel.EMPLOYS);
-			laoxing.createRelationshipTo(shibalipu, Rel.EMPLOYED);
+			laoxing.createRelationshipTo(shibalipu, Rel.MEMBER_OF);
 			longmen.createRelationshipTo(tongboda, Rel.EMPLOYS);
-			tongboda.createRelationshipTo(longmen, Rel.EMPLOYED);
+			tongboda.createRelationshipTo(longmen, Rel.MEMBER_OF);
 			baima.createRelationshipTo(xiansheng, Rel.EMPLOYS);
-			xiansheng.createRelationshipTo(baima, Rel.EMPLOYED);
+			xiansheng.createRelationshipTo(baima, Rel.MEMBER_OF);
+			baima.createRelationshipTo(xiaobei, Rel.EMPLOYS);
+			xiaobei.createRelationshipTo(baima, Rel.MEMBER_OF);
 			kunlun.createRelationshipTo(laohe, Rel.EMPLOYS);
-			laohe.createRelationshipTo(kunlun, Rel.EMPLOYED);
+			laohe.createRelationshipTo(kunlun, Rel.MEMBER_OF);
 			kunlun.createRelationshipTo(hanjuan, Rel.EMPLOYS);
-			hanjuan.createRelationshipTo(kunlun, Rel.EMPLOYED);
+			hanjuan.createRelationshipTo(kunlun, Rel.MEMBER_OF);
 
 			tx.success();
 		} finally {
 			tx.finish();
 		}
 
-		Node foundUser = userIndex.get(Neo4jDB.NAME_KEY, "白展堂").getSingle();
+		Node foundUser = userIndex.get(Name.NAME_KEY, "白展堂").getSingle();
 
-		logger.debug("~~~~~~~~~~~~~~~~~~" + foundUser.getProperty(Neo4jDB.PROFESSION_KEY));
+		logger.debug("~~~~~~~~~~~~~~~~~~" + foundUser.getProperty(Name.PROFESSION_KEY));
 
 		graphDb.shutdown();
 	}
 
 	private static Node createIndexUser(final String name, final int age, final String gender, final String profession) {
 		Node node = graphDb.createNode();
-		node.setProperty(Neo4jDB.NAME_KEY, name);
-		node.setProperty(Neo4jDB.AGE_KEY, age);
-		node.setProperty(Neo4jDB.GENDER_KEY, gender);
-		node.setProperty(Neo4jDB.PROFESSION_KEY, profession);
+		node.setProperty(Name.NAME_KEY, name);
+		node.setProperty(Name.AGE_KEY, age);
+		node.setProperty(Name.GENDER_KEY, gender);
+		node.setProperty(Name.PROFESSION_KEY, profession);
 
 		// 添加该记录的索引
-		userIndex.add(node, Neo4jDB.NAME_KEY, name);
-		userIndex.add(node, Neo4jDB.AGE_KEY, age);
-		userIndex.add(node, Neo4jDB.GENDER_KEY, gender);
-		userIndex.add(node, Neo4jDB.PROFESSION_KEY, profession);
+		userIndex.add(node, Name.NAME_KEY, name);
+		userIndex.add(node, Name.AGE_KEY, age);
+		userIndex.add(node, Name.GENDER_KEY, gender);
+		userIndex.add(node, Name.PROFESSION_KEY, profession);
 		return node;
 	}
 
 	private static Node createIndexOrg(String name, String description) {
 		Node node = graphDb.createNode();
-		node.setProperty(Neo4jDB.NAME_KEY, name);
-		node.setProperty(Neo4jDB.DESCRIPTION_KEY, description);
+		node.setProperty(Name.NAME_KEY, name);
+		node.setProperty(Name.DESCRIPTION_KEY, description);
 		// 添加该记录的索引
-		orgIndex.add(node, Neo4jDB.NAME_KEY, name);
-		orgIndex.add(node, Neo4jDB.DESCRIPTION_KEY, description);
+		orgIndex.add(node, Name.NAME_KEY, name);
+		orgIndex.add(node, Name.DESCRIPTION_KEY, description);
 		return node;
 	}
 

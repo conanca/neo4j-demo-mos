@@ -1,6 +1,6 @@
 package com.dolplay.demo.mos.util;
 
-public class Neo4jDB {
+public class Name {
 	public static final String DB_PATH = "/home/conanca/apps/neo4j-demo-mos/db";
 	public static final String USER_INDEX = "user_index";
 	public static final String ORG_INDEX = "org_index";
