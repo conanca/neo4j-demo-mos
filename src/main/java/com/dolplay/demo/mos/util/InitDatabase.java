@@ -52,8 +52,6 @@ public class InitDatabase {
 			xiangyu.createRelationshipTo(dazui, Rel.KNOWS);
 			xiangyu.createRelationshipTo(xiaobei, Rel.KNOWS);
 
-			logger.debug("~~~~~~~~~~~~~~~~~~~~~" + xiangyu.getId());
-
 			zhantang.createRelationshipTo(xiangyu, Rel.KNOWS);
 			zhantang.createRelationshipTo(xiaoguo, Rel.KNOWS);
 			zhantang.createRelationshipTo(xiucai, Rel.KNOWS);
@@ -159,6 +157,13 @@ public class InitDatabase {
 
 			// 建立单位(公司/组织/机构)关系
 			logger.debug("建立单位关系");
+
+			xiangyu.createRelationshipTo(tongfu, Rel.ADMIN);
+			xiansheng.createRelationshipTo(baima, Rel.ADMIN);
+			xiaobei.createRelationshipTo(hengshan, Rel.ADMIN);
+			tongboda.createRelationshipTo(longmen, Rel.ADMIN);
+			laohe.createRelationshipTo(kunlun, Rel.ADMIN);
+
 			tongfu.createRelationshipTo(xiangyu, Rel.EMPLOYS);
 			xiangyu.createRelationshipTo(tongfu, Rel.MEMBER_OF);
 			tongfu.createRelationshipTo(zhantang, Rel.EMPLOYS);
@@ -192,16 +197,13 @@ public class InitDatabase {
 		} finally {
 			tx.finish();
 		}
-
-		Node foundUser = userIndex.get(Name.NAME_KEY, "白展堂").getSingle();
-
-		logger.debug("~~~~~~~~~~~~~~~~~~" + foundUser.getProperty(Name.PROFESSION_KEY));
-
 		graphDb.shutdown();
+		logger.debug("完成！");
 	}
 
 	private static Node createIndexUser(final String name, final int age, final String gender, final String profession) {
 		Node node = graphDb.createNode();
+		logger.debug(node.getId() + " - " + name);
 		node.setProperty(Name.NAME_KEY, name);
 		node.setProperty(Name.AGE_KEY, age);
 		node.setProperty(Name.GENDER_KEY, gender);
@@ -217,6 +219,7 @@ public class InitDatabase {
 
 	private static Node createIndexOrg(String name, String description) {
 		Node node = graphDb.createNode();
+		logger.debug(node.getId() + " - " + name);
 		node.setProperty(Name.NAME_KEY, name);
 		node.setProperty(Name.DESCRIPTION_KEY, description);
 		// 添加该记录的索引

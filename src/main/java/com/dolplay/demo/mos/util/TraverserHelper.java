@@ -22,7 +22,7 @@ public class TraverserHelper {
 	 * @param person
 	 * @return
 	 */
-	public static Traverser getFriends(final Node person) {
+	public static Traverser getFriends(Node person) {
 		TraversalDescription td = Traversal.description().breadthFirst().relationships(Rel.KNOWS, Direction.OUTGOING)
 				.evaluator(Evaluators.excludeStartPosition());
 		return td.traverse(person);
@@ -48,7 +48,7 @@ public class TraverserHelper {
 	 * @return
 	 */
 	public static Traverser findAllOrg1(Node refeNode) {
-		TraversalDescription td = Traversal.description().depthFirst().relationships(RefeRel.ORG, Direction.INCOMING)
+		TraversalDescription td = Traversal.description().breadthFirst().relationships(RefeRel.ORG, Direction.INCOMING)
 				.evaluator(Evaluators.excludeStartPosition());
 		return td.traverse(refeNode);
 	}
@@ -71,10 +71,34 @@ public class TraverserHelper {
 	 * @return
 	 */
 	public static Traverser findAllOrgUser(Node refeNode) {
-		TraversalDescription td = Traversal.description().depthFirst().relationships(RefeRel.ORG, Direction.INCOMING)
+		TraversalDescription td = Traversal.description().breadthFirst().relationships(RefeRel.ORG, Direction.INCOMING)
 				.relationships(Rel.MEMBER_OF, Direction.INCOMING)
 				.evaluator(Evaluators.includeWhereLastRelationshipTypeIs(Rel.MEMBER_OF));
 		return td.traverse(refeNode);
+	}
+
+	/**
+	 * 查找所有单位的BOSS
+	 * @param refeNode
+	 * @return
+	 */
+	public static Traverser findAllBoss(Node refeNode) {
+		TraversalDescription td = Traversal.description().breadthFirst().relationships(RefeRel.ORG, Direction.INCOMING)
+				.relationships(Rel.ADMIN, Direction.INCOMING)
+				.evaluator(Evaluators.includeWhereLastRelationshipTypeIs(Rel.ADMIN));
+		return td.traverse(refeNode);
+	}
+
+	/**
+	 * 查找某人同事
+	 * @param person
+	 * @return
+	 */
+	public static Traverser findColleague(Node person) {
+		TraversalDescription td = Traversal.description().breadthFirst()
+				.relationships(Rel.MEMBER_OF, Direction.OUTGOING).relationships(Rel.MEMBER_OF, Direction.INCOMING)
+				.evaluator(Evaluators.fromDepth(2));
+		return td.traverse(person);
 	}
 
 	/**
@@ -100,12 +124,12 @@ public class TraverserHelper {
 			for (Node node : userPath.nodes()) {
 				chain += node.getProperty(Name.NAME_KEY).toString() + " → ";
 			}
-			logger.debug(userPath.endNode().getProperty(Name.NAME_KEY).toString() + "—深度为：" + userPath.length()
-					+ "(" + chain.substring(0, chain.length() - 2) + ")");
+			logger.debug(userPath.endNode().getProperty(Name.NAME_KEY).toString() + "—深度为：" + userPath.length() + "("
+					+ chain.substring(0, chain.length() - 2) + ")");
 		}
 
 		// 两个人之间的最短路径
-		logger.debug("==两个人之间的最短路径：");
+		logger.debug("==两个人之间的最短路径（其实就是查找俩人之间的人脉关系）：");
 		Node startNode = graphDb.getNodeById(8);
 		Node endNode = graphDb.getNodeById(12);
 		Path shortestPath = TraverserHelper.findShortestFriendPath(startNode, endNode);
@@ -120,6 +144,20 @@ public class TraverserHelper {
 		Traverser orgUserTraverser = TraverserHelper.findAllOrgUser(refeNode);
 		for (Path orgUserPath : orgUserTraverser) {
 			logger.debug(orgUserPath.endNode().getProperty(Name.NAME_KEY).toString());
+		}
+
+		// 查找所有的BOSS
+		logger.debug("==查找所有的BOSS：");
+		Traverser bossTraverser = TraverserHelper.findAllBoss(refeNode);
+		for (Path bossPath : bossTraverser) {
+			logger.debug(bossPath.endNode().getProperty(Name.NAME_KEY).toString());
+		}
+
+		// 查找某人的所有同事
+		logger.debug("==查找某人的所有同事：");
+		Traverser colleagueTraverser = TraverserHelper.findColleague(xNode);
+		for (Path colleaguePath : colleagueTraverser) {
+			logger.debug(colleaguePath.endNode().getProperty(Name.NAME_KEY).toString());
 		}
 
 		graphDb.shutdown();
