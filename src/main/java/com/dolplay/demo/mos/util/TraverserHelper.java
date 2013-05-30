@@ -102,6 +102,18 @@ public class TraverserHelper {
 	}
 
 	/**
+	 * 找到某人的BOSS
+	 * @param person
+	 * @return
+	 */
+	public static Traverser findMyBoss(Node person) {
+		TraversalDescription td = Traversal.description().depthFirst().relationships(Rel.MEMBER_OF, Direction.OUTGOING)
+				.relationships(Rel.ADMIN, Direction.INCOMING)
+				.evaluator(Evaluators.includeWhereLastRelationshipTypeIs(Rel.ADMIN));
+		return td.traverse(person);
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -158,6 +170,15 @@ public class TraverserHelper {
 		Traverser colleagueTraverser = TraverserHelper.findColleague(xNode);
 		for (Path colleaguePath : colleagueTraverser) {
 			logger.debug(colleaguePath.endNode().getProperty(Name.NAME_KEY).toString());
+		}
+
+		// 查找某人的BOSS
+		logger.debug("==查找某人的BOSS：");
+		xNode = graphDb.getNodeById(3);
+		logger.debug(xNode.getProperty(Name.NAME_KEY) + "的BOSS是");
+		Traverser myBossTraverser = TraverserHelper.findMyBoss(xNode);
+		for (Path myBossPath : myBossTraverser) {
+			logger.debug(myBossPath.endNode().getProperty(Name.NAME_KEY).toString());
 		}
 
 		graphDb.shutdown();
